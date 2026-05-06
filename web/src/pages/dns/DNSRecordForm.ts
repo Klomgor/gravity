@@ -254,6 +254,14 @@ export class DNSRecordForm extends ModelForm<DnsAPIRecord, string> {
                     required
                 />
             </ak-form-element-horizontal>
+            <ak-form-element-horizontal label="TTL" required name="ttl">
+                <input
+                    type="number"
+                    value=${this.instance?.ttl ?? 500}
+                    class="pf-c-form-control"
+                    required
+                />
+            </ak-form-element-horizontal>
             ${this.renderTypeSpecific()}`;
     }
 }

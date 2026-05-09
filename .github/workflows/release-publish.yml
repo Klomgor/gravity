@@ -7,8 +7,9 @@ on:
 
 permissions:
   packages: write
-  contents: read
   pull-requests: read
+  contents: write
+  deployments: write
 
 jobs:
   build:
@@ -98,3 +99,25 @@ jobs:
           file: ./bin/gravity-cli
           asset_name: gravity-cli_${{ matrix.os }}_${{ matrix.arch }}
           tag: ${{ github.ref }}
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v5
+      - uses: ./.github/actions/setup
+      - run: make bench
+      - if: ${{ always() }}
+        run: make test-env-stop
+      - uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1
+        with:
+          name: Gravity Benchmark
+          tool: 'go'
+          output-file-path: .test-output
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@BeryJu'
+          summary-always: true
